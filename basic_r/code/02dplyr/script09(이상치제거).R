@@ -1,3 +1,5 @@
+install.packages("dplyr")
+library(dplyr)
 # 이상한값 처리하기
 # 논리적으로 이상한 값_ex)남,녀, 3(?)
 # 상하위 0.3%를 벗어나면 극단치(이상한값)
@@ -44,11 +46,43 @@ mpg %>%
 mpg <- as.data.frame(mpg)
 mpg[c(10, 14, 58, 93), "drv"] <- "k"
 mpg[c(29, 43, 129, 203), "cty"] <- c(3,4,39,42)
-boxplot(mpg$cty)
-mpg$drv
 
 # Q1
 # .drv에 이상치가 있는지 확인 합니다. 이상치를 결측치로 처리한 다음 확인하세요.
+
+table(mpg$drv) # 1. 이상치 확인
+mpg$drv <- ifelse(mpg$drv == "k", NA, mpg$drv)# 2. 이상치를 결측치로 처리
+table(is.na(mpg$drv))
+
+# Q2
+# boxplot을 이용해서 cty의 이상치 범위를 확인하고 통계치를 이용해서 벗어난 값을 결측처리 한 후
+# 다시 boxplot을 만들어서 확인하세요.
+boxplot(mpg$cty)
+boxplot(mpg$cty)$stats # 상자그림의 통계치
+# > 9보다 작거나 26보다 크다면 이상치이다
+mpg$cty <- ifelse(mpg$cty < 9 | mpg$cty > 26, NA, mpg$cty)
+table(is.na(mpg$cty))
+boxplot(mpg$cty) # 이상치 결측처리 확인
+#>>사실 박스를 벗어날 정도의 데이터가 아닌이상 무조건 제외하지 않아도 괜찮은것 같다(강사님)
+
+# Q3
+# drv와 cty의 이상치를 결측처리 했다면, 결측치를 제외한 다음 drv별 cty평균이 어떻게 다른지 확인하세요. 파이프라인을 사용합니다. (그룹핑)
+mpg %>% 
+  filter(!is.na(drv) & !is.na(cty)) %>% 
+  group_by(drv) %>% 
+  summarise(mean_cty = mean(cty)) %>%  # na.rm = T(na를 삭제해서 진행해도 됨)
+  select(drv, mean_cty) %>%  
+  arrange(mean_cty)
+
+
+
+
+
+
+
+
+
+
 
 
 
