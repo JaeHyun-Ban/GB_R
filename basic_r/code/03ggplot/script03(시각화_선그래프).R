@@ -43,7 +43,7 @@ num <- ceiling(runif(length(date)) * 10)
 df <- data.frame(date, num)
 # 날짜별 데이터 프레임
 ggplot(df, aes(x = date, y = num)) + 
-:  geom_line()
+  geom_line()
 
 #================================================
 # 상자 그래프
